@@ -1,3 +1,5 @@
+import sha1 from 'sha1';
+
 const { MongoClient } = require('mongodb');
 
 class DBClient {
@@ -25,6 +27,19 @@ class DBClient {
   async nbFiles() {
     const db = this.client.db(this.database);
     return db.collection('files').countDocuments();
+  }
+
+  async addUsers(email, password) {
+    return new Promise((resolve, reject) => {
+      if (!email) reject(new Error('Missing email'));
+      if (!password) reject(new Error('Missing password'));
+      const db = this.client.db(this.database);
+      db.collection('users').createIndex({ email: 1 }, { unique: true });
+      db.collection('users').insertOne({ email, password: sha1(password) }, (error, result) => {
+        if (result) resolve(result.insertedId);
+        reject(new Error('Already exist'));
+      });
+    });
   }
 }
 
