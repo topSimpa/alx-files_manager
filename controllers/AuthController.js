@@ -21,7 +21,6 @@ class AuthController {
       dbClient.findUser(email, password).then((id) => {
         const token = this.tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);
-        console.log(id);
         res.json({ token });
       }).catch((error) => {
         res.status(401);
