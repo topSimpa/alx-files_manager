@@ -27,7 +27,7 @@ class UsersController {
       res.json({ id: _id, email });
     }).catch((error) => {
       res.status(401);
-      res.json(error);
+      res.json({ error: error.message });
     });
   }
 }
