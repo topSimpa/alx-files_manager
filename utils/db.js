@@ -1,4 +1,5 @@
 import sha1 from 'sha1';
+import fs from 'fs';
 
 const { MongoClient } = require('mongodb');
 const { ObjectId } = require('mongodb');
@@ -12,12 +13,24 @@ class DBClient {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-
+    this.folder = null;
     this.client.connect();
   }
 
   isAlive() {
     return this.client.isConnected();
+  }
+
+  async createFolder(folderName) {
+    if (this.folder !== folderName) {
+      fs.mkdir(folderName, { recursive: true }, (err) => err);
+      this.folder = folderName;
+    }
+  }
+
+  async writeFile(file, data) {
+    const utfData = Buffer.from(data, 'base64').toString('utf-8');
+    fs.writeFile(`${this.folder}/${file}`, utfData, (err) => err);
   }
 
   async nbUsers() {
@@ -43,6 +56,28 @@ class DBClient {
     });
   }
 
+  async addFolder(doc) {
+    return new Promise((resolve, reject) => {
+      const db = this.client.db(this.database);
+      db.collection('files').insertOne(doc, (err, result) => {
+        if (err) reject();
+        resolve(result.insertedId);
+      });
+    });
+  }
+
+  async addFile(doc, data, folder, name) {
+    this.createFolder(folder);
+    this.writeFile(name, data);
+    return new Promise((resolve, reject) => {
+      const db = this.client.db(this.database);
+      db.collection('files').insertOne(doc, (err, result) => {
+        if (err) reject();
+        resolve(result.insertedId);
+      });
+    });
+  }
+
   async findUser(email, password) {
     const db = this.client.db(this.database);
     return new Promise((resolve, reject) => {
@@ -59,6 +94,18 @@ class DBClient {
       db.collection('users').findOne({ _id: ObjectId(id) }, (err, result) => {
         if (err) reject(new Error('Unauthorized'));
         resolve(result);
+      });
+    });
+  }
+
+  async findFile(query) {
+    const db = this.client.db(this.database);
+    return new Promise((resolve, reject) => {
+      db.collection('files').findOne(query, (err, result) => {
+        if (err) reject(err);
+        if (!result) reject(new Error('Parent not found'));
+        if (result.type !== 'folder') reject(new Error('Parent is not a folder'));
+        resolve(result.insertedId);
       });
     });
   }

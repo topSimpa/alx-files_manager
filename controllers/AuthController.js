@@ -18,26 +18,24 @@ class AuthController {
     const header = req.get('Authorization');
     if (header) {
       const { email, password } = this.extractCredential(header);
-      dbClient.findUser(email, password).then((id) => {
+      return dbClient.findUser(email, password).then((id) => {
         const token = this.tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);
-        res.json({ token });
-      }).catch((error) => {
-        res.status(401);
-        res.json({ error: error.message });
-      });
+        return res.json({ token });
+      }).catch((error) => res.status(401).json({ error: error.message }));
     }
+    res.set('WWW-Authenticate', 'Basic realm="User Login"');
+    return res.status(401).json({ error: 'Invalid credentials.' });
   }
 
   static async getDisconnect(req, res) {
     const token = req.get('X-Token');
     const userId = await redisClient.get(`auth_${token}`);
     if (!userId) {
-      res.status(401);
-      res.json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
     redisClient.del(`auth_${token}`);
-    res.send();
+    return res.send();
   }
 }
 
