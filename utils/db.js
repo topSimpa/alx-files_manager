@@ -1,4 +1,5 @@
 import sha1 from 'sha1';
+import { v4 as uuidv4 } from 'uuid';
 
 const { MongoClient } = require('mongodb');
 const { ObjectId } = require('mongodb');
@@ -14,6 +15,17 @@ class DBClient {
     });
 
     this.client.connect();
+  }
+
+  static extractCredential(header) {
+    const key = header.replace('Basic ', '');
+    const credential = Buffer.from(key, 'base64').toString('utf-8');
+    const [email, password] = credential.split(':');
+    return { email, password };
+  }
+
+  static tokenGenerator() {
+    return String(uuidv4());
   }
 
   isAlive() {

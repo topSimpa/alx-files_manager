@@ -1,4 +1,3 @@
-import AuthHelper from '../utils/auth';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
@@ -6,9 +5,9 @@ class AuthController {
   static getConnect(req, res) {
     const header = req.get('Authorization');
     if (header) {
-      const { email, password } = AuthHelper.extractCredential(header);
+      const { email, password } = dbClient.extractCredential(header);
       dbClient.findUser(email, password).then((id) => {
-        const token = AuthHelper.tokenGenerator();
+        const token = dbClient.tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);
         console.log(id);
         res.json({ token });
