@@ -1,13 +1,25 @@
+import { v4 as uuidv4 } from 'uuid';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
 
 class AuthController {
+  static extractCredential(header) {
+    const key = header.replace('Basic ', '');
+    const credential = Buffer.from(key, 'base64').toString('utf-8');
+    const [email, password] = credential.split(':');
+    return { email, password };
+  }
+
+  static tokenGenerator() {
+    return String(uuidv4());
+  }
+
   static getConnect(req, res) {
     const header = req.get('Authorization');
     if (header) {
-      const { email, password } = dbClient.extractCredential(header);
+      const { email, password } = this.extractCredential(header);
       dbClient.findUser(email, password).then((id) => {
-        const token = dbClient.tokenGenerator();
+        const token = this.tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);
         console.log(id);
         res.json({ token });
