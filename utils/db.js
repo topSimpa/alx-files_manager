@@ -1,6 +1,7 @@
 import sha1 from 'sha1';
 
 const { MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 
 class DBClient {
   constructor() {
@@ -38,6 +39,26 @@ class DBClient {
       db.collection('users').insertOne({ email, password: sha1(password) }, (error, result) => {
         if (result) resolve(result.insertedId);
         reject(new Error('Already exist'));
+      });
+    });
+  }
+
+  async findUser(email, password) {
+    const db = this.client.db(this.database);
+    return new Promise((resolve, reject) => {
+      db.collection('users').findOne({ email, password: sha1(password) }, (error, result) => {
+        if (error) reject(new Error('Unauthorized'));
+        resolve(result._id);
+      });
+    });
+  }
+
+  async findUserById(id) {
+    const db = this.client.db(this.database);
+    return new Promise((resolve, reject) => {
+      db.collection('users').findOne({ _id: ObjectId(id) }, (err, result) => {
+        if (err) reject(new Error('Unauthorized'));
+        resolve(result);
       });
     });
   }
