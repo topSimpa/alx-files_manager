@@ -5,6 +5,7 @@ class UsersController {
   static postNew(req, res) {
     const { email, password } = req.body;
 
+<<<<<<< HEAD
 // <<<<<<< HEAD
     // return dbClient.addUsers(email, password)
     //   .then((id) => res.status(201).json({ id, email }))
@@ -21,6 +22,11 @@ class UsersController {
     //   const { _id, email } = result;
     //   res.json({ id: _id, email });
     // }).catch((error) => res.status(401).json({ error: error.message }));
+=======
+    return dbClient.addUsers(email, password).then((id) => res.status(201).json({ id, email }))
+      .catch((error) => res.status(400).json({ error: error.message }));
+  }
+>>>>>>> parent of fc0d2a1 (formated UsersController.js)
 
     dbClient.addUsers(email, password).then((id) => {
       res.status(201);
