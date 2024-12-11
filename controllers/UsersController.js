@@ -5,7 +5,8 @@ class UsersController {
   static postNew(req, res) {
     const { email, password } = req.body;
 
-    return dbClient.addUsers(email, password).then((id) => res.status(201).json({ id, email }))
+    return dbClient.addUsers(email, password)
+      .then((id) => res.status(201).json({ id, email }))
       .catch((error) => res.status(400).json({ error: error.message }));
   }
 
