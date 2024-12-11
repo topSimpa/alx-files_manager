@@ -6,7 +6,7 @@ import FilesController from '../controllers/FilesController';
 
 const router = new Router();
 
-router.get('/connect', (req, res) => AuthController.getConnect(req, res));
+router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
 router.get('/status', AppController.getStatus);
 router.get('/stats', AppController.getStats);
