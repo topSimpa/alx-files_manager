@@ -78,17 +78,12 @@ class DBClient {
     });
   }
 
-  findUser(email, password) {
+  async findUser(email, password) {
     const db = this.client.db(this.database);
-    return new Promise((resolve, reject) => {
-      db.collection('users').findOne({ email, password: sha1(password) }, (error, result) => {
-        if (error) reject(new Error('Unauthorized'));
-        resolve(result._id);
-      });
-    });
+    return db.collection('users').findOne({ email, password: sha1(password) });
   }
 
-  findUserById(id) {
+  async findUserById(id) {
     const db = this.client.db(this.database);
     return new Promise((resolve, reject) => {
       db.collection('users').findOne({ _id: ObjectId(id) }, (err, result) => {
@@ -98,16 +93,24 @@ class DBClient {
     });
   }
 
-  findFile(query) {
+  findFiles(query) {
     const db = this.client.db(this.database);
-    return new Promise((resolve, reject) => {
-      db.collection('files').findOne(query, (err, result) => {
-        if (err) reject(err);
-        if (!result) reject(new Error('Parent not found'));
-        if (result.type !== 'folder') reject(new Error('Parent is not a folder'));
-        resolve(result.insertedId);
-      });
-    });
+    return db.collection('files').find(query);
+  }
+
+  async getFiles(query, page) {
+    const db = this.client.db(this.database);
+    console.log(query);
+    const files = await db.collection('files').aggregate([
+      { $match: query },
+      { $sort: { _id: 1 } },
+      {
+        $facet: {
+          data: [{ $skip: (page) * 20 }, { $limit: 20 }],
+        },
+      },
+    ]).toArray();
+    return files[0].data;
   }
 }
 

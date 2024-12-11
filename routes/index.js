@@ -8,6 +8,8 @@ const router = new Router();
 
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
+router.get('/files/:id', FilesController.getShow);
+router.get('/files', FilesController.getIndex);
 router.get('/status', AppController.getStatus);
 router.get('/stats', AppController.getStats);
 router.post('/users', UsersController.postNew);

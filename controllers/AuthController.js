@@ -14,15 +14,19 @@ function extractCredential(header) {
 }
 
 class AuthController {
-  static getConnect(req, res) {
+  static async getConnect(req, res) {
     const header = req.get('Authorization');
     if (header) {
       const { email, password } = extractCredential(header);
-      return dbClient.findUser(email, password).then((id) => {
+      const user = await dbClient.findUser(email, password);
+      if (user) {
+        console.log(user);
+        const id = user._id;
         const token = tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);
         return res.json({ token });
-      }).catch((error) => res.status(401).json({ error: error.message }));
+      }
+      return res.status(400).json({ error: 'Unauthorized' });
     }
     res.set('WWW-Authenticate', 'Basic realm="User Login"');
     return res.status(401).json({ error: 'Invalid credentials.' });
