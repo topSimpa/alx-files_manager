@@ -85,12 +85,8 @@ class DBClient {
 
   async findUserById(id) {
     const db = this.client.db(this.database);
-    return new Promise((resolve, reject) => {
-      db.collection('users').findOne({ _id: ObjectId(id) }, (err, result) => {
-        if (err) reject(new Error('Unauthorized'));
-        resolve(result);
-      });
-    });
+    const result = await db.collection('users').findOne({ _id: ObjectId(id) });
+    return result;
   }
 
   findFiles(query) {

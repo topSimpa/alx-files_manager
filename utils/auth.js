@@ -1,10 +1,11 @@
 import redisClient from './redis';
 
-function isAuthorized(token) {
+async function isAuthorized(token) {
+  const userId = await redisClient.get(`auth_${token}`);
   return new Promise((resolve, reject) => {
-    const userId = redisClient.get(`auth_${token}`);
+    console.log(userId);
     if (userId) resolve(userId);
-    reject(new Error('Unauthorized'));
+    else reject(new Error('Unauthorized'));
   });
 }
 
