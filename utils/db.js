@@ -43,7 +43,7 @@ class DBClient {
     return db.collection('files').countDocuments();
   }
 
-  async addUsers(email, password) {
+  addUsers(email, password) {
     return new Promise((resolve, reject) => {
       if (!email) reject(new Error('Missing email'));
       if (!password) reject(new Error('Missing password'));
@@ -56,7 +56,7 @@ class DBClient {
     });
   }
 
-  async addFolder(doc) {
+  addFolder(doc) {
     return new Promise((resolve, reject) => {
       const db = this.client.db(this.database);
       db.collection('files').insertOne(doc, (err, result) => {
@@ -66,7 +66,7 @@ class DBClient {
     });
   }
 
-  async addFile(doc, data, folder, name) {
+  addFile(doc, data, folder, name) {
     this.createFolder(folder);
     this.writeFile(name, data);
     return new Promise((resolve, reject) => {
@@ -78,7 +78,7 @@ class DBClient {
     });
   }
 
-  async findUser(email, password) {
+  findUser(email, password) {
     const db = this.client.db(this.database);
     return new Promise((resolve, reject) => {
       db.collection('users').findOne({ email, password: sha1(password) }, (error, result) => {
@@ -88,7 +88,7 @@ class DBClient {
     });
   }
 
-  async findUserById(id) {
+  findUserById(id) {
     const db = this.client.db(this.database);
     return new Promise((resolve, reject) => {
       db.collection('users').findOne({ _id: ObjectId(id) }, (err, result) => {
@@ -98,7 +98,7 @@ class DBClient {
     });
   }
 
-  async findFile(query) {
+  findFile(query) {
     const db = this.client.db(this.database);
     return new Promise((resolve, reject) => {
       db.collection('files').findOne(query, (err, result) => {
