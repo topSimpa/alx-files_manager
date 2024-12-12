@@ -43,17 +43,17 @@ class DBClient {
     return db.collection('files').countDocuments();
   }
 
-  addUsers(email, password) {
-    return new Promise((resolve, reject) => {
-      if (!email) reject(new Error('Missing email'));
-      if (!password) reject(new Error('Missing password'));
-      const db = this.client.db(this.database);
-      db.collection('users').createIndex({ email: 1 }, { unique: true });
-      db.collection('users').insertOne({ email, password: sha1(password) }, (error, result) => {
-        if (result) resolve(result.insertedId);
-        reject(new Error('Already exist'));
-      });
-    });
+  async addUsers(email, password) {
+    if (!email) throw (new Error('Missing email'));
+    if (!password) throw (new Error('Missing password'));
+    const db = this.client.db(this.database);
+    db.collection('users').createIndex({ email: 1 }, { unique: true });
+    try {
+      const result = await db.collection('users').insertOne({ email, password: sha1(password) });
+      return result.insertedId;
+    } catch (error) {
+      throw (new Error('Already exist'));
+    }
   }
 
   addFolder(doc) {

@@ -20,7 +20,6 @@ class AuthController {
       const { email, password } = extractCredential(header);
       const user = await dbClient.findUser(email, password);
       if (user) {
-        console.log(user);
         const id = user._id;
         const token = tokenGenerator();
         redisClient.set(`auth_${token}`, id.toString(), 86400);

@@ -2,11 +2,15 @@ import dbClient from '../utils/db';
 import isAuthorized from '../utils/auth';
 
 class UsersController {
-  static postNew(req, res) {
+  static async postNew(req, res) {
     const { email, password } = req.body;
 
-    return dbClient.addUsers(email, password).then((id) => res.status(201).json({ id, email }))
-      .catch((error) => res.status(400).json({ error: error.message }));
+    try {
+      const id = await dbClient.addUsers(email, password);
+      return res.json({ id, email });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
   }
 
   static async getMe(req, res) {
