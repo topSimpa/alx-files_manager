@@ -18,6 +18,7 @@ class AuthController {
     const header = req.get('Authorization');
     if (header) {
       const { email, password } = extractCredential(header);
+      if (!(email && password)) return res.status(401).json({ error: 'Unauthorized' });
       const user = await dbClient.findUser(email, password);
       if (user) {
         const id = user._id;
@@ -25,7 +26,7 @@ class AuthController {
         redisClient.set(`auth_${token}`, id.toString(), 86400);
         return res.json({ token });
       }
-      return res.status(400).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
     res.set('WWW-Authenticate', 'Basic realm="User Login"');
     return res.status(401).json({ error: 'Invalid credentials.' });
