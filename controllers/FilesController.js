@@ -32,7 +32,7 @@ class FilesController {
       }, data, folder, fileName).then((id) => res.status(201).json({
         id, userId, name, type, isPublic, parentId,
       })).catch(() => res);
-    }).catch((err) => res.status(400).json({ error: err.message }));
+    }).catch((err) => res.status(401).json({ error: err.message }));
   }
 
   static getShow(req, res) {
@@ -45,7 +45,7 @@ class FilesController {
       return res.json({
         id: _id, userId, name, type, isPublic, parentId,
       });
-    }).catch((err) => res.status(400).json({ error: err.message }));
+    }).catch((err) => res.status(401).json({ error: err.message }));
   }
 
   static getIndex(req, res) {
@@ -55,7 +55,7 @@ class FilesController {
       const page = req.query.page || '0';
       const files = await dbClient.getFiles({ userId, parentId }, Number(page));
       return res.json(files);
-    }).catch((err) => res.status(400).json({ error: err.message }));
+    }).catch((err) => res.status(401).json({ error: err.message }));
   }
 }
 module.exports = FilesController;
