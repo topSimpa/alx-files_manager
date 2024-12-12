@@ -11,11 +11,11 @@ class FilesController {
       } = req.body;
       if (!name) return res.status(400).json({ error: 'Missing name' });
       if (!type) return res.status(400).json({ error: 'Missing type' });
-      if (!data && type !== 'folder') return res.status(400).json('Missing data');
+      if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
       if (parentId) {
         const folder = await dbClient.findFile({ _id: ObjectId(parentId) });
         if (!folder) return res.status(400).res.json('Parent not found');
-        if (folder.type !== 'folder') return res.status(400).res.json('Parent is not a folder');
+        if (folder.type !== 'folder') return res.status(400).res.json({ error: 'Parent is not a folder' });
       }
       if (type === 'folder') {
         return dbClient.addFolder({
@@ -51,7 +51,7 @@ class FilesController {
   static getIndex(req, res) {
     isAuthorized(req.get('X-Token')).then(async (userId) => {
       const parentId = req.query.parentId || '0';
-      console.log(parentId);
+      // console.log(parentId);
       const page = req.query.page || '0';
       const files = await dbClient.getFiles({ userId, parentId }, Number(page));
       return res.json(files);
