@@ -7,7 +7,7 @@ class UsersController {
 
     try {
       const id = await dbClient.addUsers(email, password);
-      return res.json({ id, email });
+      return res.status(201).json({ id, email });
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
