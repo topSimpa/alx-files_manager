@@ -76,12 +76,15 @@ class FilesController {
   }
 
   static getShow(req, res) {
+    console.log('getShow');
+    console.log(req.params.id);
     isAuthorized(req.get('X-Token'))
       .then(async (userId) => {
         const file = await dbClient.findFile({
-          userId,
+          userId: ObjectId(userId),
           _id: ObjectId(req.params.id),
         });
+        console.log(file);
         if (!file) return res.status(404).json({ error: 'Not found' });
         const {
           _id, name, type, isPublic, parentId,
