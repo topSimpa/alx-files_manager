@@ -102,13 +102,8 @@ class FilesController {
   static getIndex(req, res) {
     isAuthorized(req.get('X-Token'))
       .then(async (userId) => {
-        console.log(req.query.parentId);
         const parentId = req.query.parentId ? ObjectId(req.query.parentId) : '0';
-        console.log(parentId);
         const page = req.query.page || 0;
-        console.log(userId);
-        const docs = await dbClient.findFiles({ userId: ObjectId(userId) });
-        //console.log(docs);
         const files = await dbClient.getFiles(
           { userId: ObjectId(userId), parentId },
           Number(page),
