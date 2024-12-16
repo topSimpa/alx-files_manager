@@ -70,7 +70,6 @@ class FilesController {
           .catch(() => res);
       })
       .catch((err) => {
-        console.log(err.message);
         res.status(401).json({ error: err.message });
       });
   }
@@ -84,7 +83,6 @@ class FilesController {
           userId: ObjectId(userId),
           _id: ObjectId(req.params.id),
         });
-        console.log(file);
         if (!file) return res.status(404).json({ error: 'Not found' });
         const {
           _id, name, type, isPublic, parentId,
@@ -104,11 +102,15 @@ class FilesController {
   static getIndex(req, res) {
     isAuthorized(req.get('X-Token'))
       .then(async (userId) => {
-        const parentId = req.query.parentId || '0';
-        // console.log(parentId);
-        const page = req.query.page || '0';
+        console.log(req.query.parentId);
+        const parentId = req.query.parentId ? ObjectId(req.query.parentId) : '0';
+        console.log(parentId);
+        const page = req.query.page || 0;
+        console.log(userId);
+        const docs = await dbClient.findFiles({ userId: ObjectId(userId) });
+        //console.log(docs);
         const files = await dbClient.getFiles(
-          { userId, parentId },
+          { userId: ObjectId(userId), parentId },
           Number(page),
         );
         return res.json(files);
