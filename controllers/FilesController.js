@@ -78,7 +78,7 @@ class FilesController {
   static getShow(req, res) {
     isAuthorized(req.get('X-Token'))
       .then(async (userId) => {
-        const file = await dbClient.findFiles({
+        const file = await dbClient.findFile({
           userId,
           _id: ObjectId(req.params.id),
         });
