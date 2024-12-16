@@ -14,7 +14,7 @@ class FilesController {
       if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
       if (parentId) {
         const folder = await dbClient.findFile({ _id: ObjectId(parentId) });
-        if (!folder) return res.status(400).res.json('Parent not found');
+        if (!folder) return res.status(400).res.json({ error: 'Parent not found' });
         if (folder.type !== 'folder') return res.status(400).res.json({ error: 'Parent is not a folder' });
       }
       if (type === 'folder') {
