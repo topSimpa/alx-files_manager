@@ -4,6 +4,11 @@ import fs from "fs";
 const { MongoClient } = require("mongodb");
 const { ObjectId } = require("mongodb");
 
+
+function isValidObjectId(id) {
+  return ObjectId.isValid(id) && new ObjectId(id).toString() === id;
+}
+
 class DBClient {
   constructor() {
     this.host = process.env.DB_HOST || "localhost";
@@ -13,17 +18,12 @@ class DBClient {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    this.folder = null;
+    this.isObjectId = isValidObjectId;
     this.client.connect();
   }
 
   isAlive() {
     return this.client.isConnected();
-  }
-
-  isValidObjectId(id) {
-    console.log("check");
-    return ObjectId.isValid(id) && new ObjectId(id).toString() === id;
   }
 
   async createFolder(folderName) {
