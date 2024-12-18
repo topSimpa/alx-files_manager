@@ -139,7 +139,7 @@ class DBClient {
         isPublic: value,
       },
     });
-    return result;
+    return result.value;
   }
 }
 

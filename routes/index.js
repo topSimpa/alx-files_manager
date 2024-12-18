@@ -8,7 +8,7 @@ const router = new Router();
 
 router.get('/connect', AuthController.getConnect);
 router.get('/disconnect', AuthController.getDisconnect);
-router.get('/files/:id/data', FilesController);
+router.get('/files/:id/data', FilesController.getFile);
 router.get('/files/:id', FilesController.getShow);
 router.get('/files', FilesController.getIndex);
 router.get('/status', AppController.getStatus);
