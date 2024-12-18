@@ -114,7 +114,9 @@ class FilesController {
     isAuthorized(req.get('X-token'))
       .then(async (userId) => {
         if (!dbClient.isObjectId(id)) return res.status(404).json({ error: 'Not found' });
-        const newFile = await dbClient.updateFile({ userId: ObjectId(userId), _id: ObjectId(id) });
+        const newFile = await dbClient.updateFile(
+          { userId: ObjectId(userId), _id: ObjectId(id) }, true,
+        );
         console.log(newFile);
         if (!newFile) return res.status(404).json({ error: 'Not found' });
         return res.json({
@@ -134,7 +136,9 @@ class FilesController {
     isAuthorized(req.get('X-token'))
       .then(async (userId) => {
         if (!dbClient.isObjectId(id)) return res.status(404).json({ error: 'Not found' });
-        const newFile = await dbClient.updateFile({ userId: ObjectId(userId), _id: ObjectId(id) }, false);
+        const newFile = await dbClient.updateFile(
+          { userId: ObjectId(userId), _id: ObjectId(id) }, false,
+        );
         if (!newFile) return res.status(404).json({ error: 'Not found' });
         return res.json({
           id: newFile.id,

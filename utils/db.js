@@ -138,7 +138,7 @@ class DBClient {
       $set: {
         isPublic: value,
       },
-    });
+    }, { returnDocument: 'after' });
     return result.value;
   }
 }
