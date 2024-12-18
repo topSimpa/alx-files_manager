@@ -18,10 +18,8 @@ class FilesController {
         if (!type) return res.status(400).json({ error: 'Missing type' });
         if (!data && type !== 'folder') return res.status(400).json({ error: 'Missing data' });
         if (parentId) {
-          console.log('here in parent');
           if (!dbClient.isObjectId(parentId)) return res.status(400).json({ error: 'Parent not found' });
           const folder = await dbClient.findFile({ _id: ObjectId(parentId) });
-          console.log(folder);
           if (!folder) return res.status(400).json({ error: 'Parent not found' });
           if (folder.type !== 'folder') return res.status(400).json({ error: 'Parent is not a folder' });
         }
@@ -75,8 +73,6 @@ class FilesController {
   }
 
   static getShow(req, res) {
-    console.log('getShow');
-    console.log(req.params.id);
     isAuthorized(req.get('X-Token'))
       .then(async (userId) => {
         const file = await dbClient.findFile({
@@ -112,5 +108,44 @@ class FilesController {
       })
       .catch((err) => res.status(401).json({ error: err.message }));
   }
+
+  static putPublish(req, res) {
+    const { id } = req.params;
+    isAuthorized(req.get('X-token'))
+      .then(async (userId) => {
+        if (!dbClient.isObjectId(id)) return res.status(404).json({ error: 'Not found' });
+        const newFile = dbClient.updateFile({ userId: ObjectId(userId), _id: ObjectId(id) });
+        if (!newFile) return res.status(404).json({ error: 'Not found' });
+        return res.json({
+          id: newFile.id,
+          userId: newFile.userId,
+          name: newFile.name,
+          type: newFile.type,
+          isPublic: newFile.isPublic,
+          parentId: newFile.parentId,
+        });
+      })
+      .catch((err) => res.status(401).json({ error: err.message }));
+  }
+
+  static putUnPublish(req, res) {
+    const { id } = req.params;
+    isAuthorized(req.get('X-token'))
+      .then(async (userId) => {
+        if (!dbClient.isObjectId(id)) return res.status(404).json({ error: 'Not found' });
+        const newFile = dbClient.updateFile({ userId: ObjectId(userId), _id: ObjectId(id) }, false);
+        if (!newFile) return res.status(404).json({ error: 'Not found' });
+        return res.json({
+          id: newFile.id,
+          userId: newFile.userId,
+          name: newFile.name,
+          type: newFile.type,
+          isPublic: newFile.isPublic,
+          parentId: newFile.parentId,
+        });
+      })
+      .catch((err) => res.status(401).json({ error: err.message }));
+  }
 }
+
 module.exports = FilesController;

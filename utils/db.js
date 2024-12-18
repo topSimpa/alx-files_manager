@@ -131,6 +131,16 @@ class DBClient {
     console.log(files[0]);
     return files[0].data;
   }
+
+  async updateFile(filter, value) {
+    const db = this.client.db(this.database);
+    const result = await db.collection('files').findOneAndUpdate(filter, {
+      $set: {
+        isPublic: value,
+      },
+    });
+    return result;
+  }
 }
 
 const dbClient = new DBClient();
