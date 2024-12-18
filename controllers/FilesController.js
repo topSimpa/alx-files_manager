@@ -146,6 +146,18 @@ class FilesController {
       })
       .catch((err) => res.status(401).json({ error: err.message }));
   }
+
+  static getFile(req, res) {
+    isAuthorized(req.get('X-Token'))
+      .then(async (userId) => {
+        const { id } = req.params;
+        if (!dbClient.isObject(id)) return res.status(404).json({ error: 'Not found' });
+        const file = await dbClient.findFile({ _id: ObjectId(id), userId: ObjectId(userId) });
+        if (!file) return res.status(404).json({ error: 'Not Found' });
+        if (file.type === 'folder') return res.status(400).json({ error: "A folder doesn't have content" });
+        return file.data;
+      });
+  }
 }
 
 module.exports = FilesController;
